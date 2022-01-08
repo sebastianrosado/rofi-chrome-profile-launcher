@@ -2,7 +2,7 @@
 
 ## If you don't want the script to automatically choose the Chrome version to
 ## use, set the CHROME_VERSION variable below
-CHROME_VERSION=""
+CHROME_VERSION="Brave-Browser"
 
 # Chrome version is not set, the script will try to locate it by looping through
 # all the possible chrome versions and checking if its user data dir exists
@@ -28,7 +28,8 @@ if [ -z "$CHROME_VERSION" ]; then
 fi
 
 # Check if the user data dir actually exists
-CHROME_USER_DATA_DIR="$HOME/.config/$CHROME_VERSION"
+CHROME_USER_DATA_DIR="$HOME/.config/BraveSoftware/$CHROME_VERSION"
+# echo $CHROME_USER_DATA_DIR
 if [ ! -d "$CHROME_USER_DATA_DIR" ]; then
     echo "unable to find Chrome user data dir"
     exit 1
@@ -51,7 +52,9 @@ declare -A profiles=()
 while read -r line
 do
     PROFILE="${line%_____*}"
+    # echo profile is $PROFILE
     NAME="${line#*_____}"
+    # echo name is $NAME
     profiles["$NAME"]="$PROFILE"
 done <<< "$DATA"
 
