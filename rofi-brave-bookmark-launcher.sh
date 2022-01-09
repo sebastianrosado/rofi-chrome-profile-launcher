@@ -29,16 +29,16 @@ fi
 
 # Check if the user data dir actually exists
 CHROME_USER_DATA_DIR="$HOME/.config/BraveSoftware/$CHROME_VERSION/Profile 2"
-echo $CHROME_USER_DATA_DIR
+# echo $CHROME_USER_DATA_DIR
 if [ ! -d "$CHROME_USER_DATA_DIR" ]; then
     echo "unable to find Chrome user data dir"
     exit 1
 fi
 
-# Run a python script to read profiles data from an state file used by Chrome
+# Run a python script to read bookmarks data from an state file used by Chrome
 DATA=$(python << END
 import json
-with open("$CHROME_USER_DATA_DIR//Bookmarks") as f:
+with open("$CHROME_USER_DATA_DIR/Bookmarks") as f:
     data = json.load(f)
 
 # print(data["roots"]["bookmark_bar"]["children"])
@@ -47,22 +47,22 @@ for item in data["roots"]["bookmark_bar"]["children"]:
 END
 )
 
-# Populate an associative array that maps profiles names to directories
-declare -A profiles=()
+# Populate an associative array that maps bookmarks names to directories
+declare -A bookmarks=()
 while read -r line
 do
     URL="${line%_____*}"
     NAME="${line#*_____}"
-    profiles["$NAME"]="$URL"
+    bookmarks["$NAME"]="$URL"
 done <<< "$DATA"
 
 if [ -z "$@" ]; then
-    # No argument passed, meaning that rofi was launched: show the profiles
-    for profile in "${!profiles[@]}"; do
-        echo $profile
+    # No argument passed, meaning that rofi was launched: show the bookmarks
+    for bookmark in "${!bookmarks[@]}"; do
+        echo $bookmark
     done
 else
-    # One argument passed, meaning that user selected a profile: launch Chrome
+    # One argument passed, meaning that user selected a bookmark: launch Chrome
     NAME="${@}"
-    brave-browser ${profiles[$NAME]} > /dev/null 2>&1
+    brave-browser ${bookmarks[$NAME]} > /dev/null 2>&1
 fi
