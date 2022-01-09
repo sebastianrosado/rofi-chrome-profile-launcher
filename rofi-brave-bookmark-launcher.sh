@@ -28,10 +28,16 @@ if [ -z "$CHROME_VERSION" ]; then
 fi
 
 # Check if the user data dir actually exists
-CHROME_USER_DATA_DIR="$HOME/.config/BraveSoftware/$CHROME_VERSION/Profile 2"
+CHROME_USER_DATA_DIR="$HOME/.config/BraveSoftware/$CHROME_VERSION/Profile 1"
 # echo $CHROME_USER_DATA_DIR
 if [ ! -d "$CHROME_USER_DATA_DIR" ]; then
     echo "unable to find Chrome user data dir"
+    exit 1
+fi
+
+CHROME_USER_DATA_DIR_TWO="$HOME/.config/BraveSoftware/$CHROME_VERSION/Profile 2"
+if [ ! -d "$CHROME_USER_DATA_DIR_TWO" ]; then
+    echo "unable to find Chrome user data dir 2"
     exit 1
 fi
 
@@ -39,10 +45,15 @@ fi
 DATA=$(python << END
 import json
 with open("$CHROME_USER_DATA_DIR/Bookmarks") as f:
-    data = json.load(f)
+    prof_1 = json.load(f)
+
+with open("$CHROME_USER_DATA_DIR_TWO/Bookmarks") as f:
+    prof_2 = json.load(f)
+
+combined_bookmarks = prof_1["roots"]["bookmark_bar"]["children"] + prof_2["roots"]["bookmark_bar"]["children"]
 
 # print(data["roots"]["bookmark_bar"]["children"])
-for item in data["roots"]["bookmark_bar"]["children"]:
+for item in combined_bookmarks:
     print("%s_____%s" % (item["url"], item["name"]))
 END
 )
